@@ -5,11 +5,29 @@ import axios from "axios";
 const ListaEstudiantes = () => {
   const [estudiantes, setEstudiantes] = useState([]);
 
-  useEffect(() => {
+  const obtenerEstudiantes = () => {
     axios.get("http://localhost:5000/api/estudiantes")
       .then((res) => setEstudiantes(res.data))
       .catch((err) => console.error("Error al obtener estudiantes:", err));
+  };
+
+  useEffect(() => {
+    obtenerEstudiantes();
   }, []);
+
+  const eliminarEstudiante = async (numero_control) => {
+    const confirmacion = window.confirm("¿Estás seguro de eliminar este estudiante?");
+    if (!confirmacion) return;
+
+    try {
+      await axios.delete(`http://localhost:5000/api/estudiantes/${numero_control}`);
+      alert("Estudiante eliminado correctamente");
+      obtenerEstudiantes(); // Refrescar la lista
+    } catch (error) {
+      alert("Error al eliminar estudiante");
+      console.error("Error al eliminar:", error);
+    }
+  };
 
   return (
     <div>
@@ -23,6 +41,7 @@ const ListaEstudiantes = () => {
             <th>Carrera</th>
             <th>Semestre</th>
             <th>Correo</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -34,6 +53,9 @@ const ListaEstudiantes = () => {
               <td>{est.carrera}</td>
               <td>{est.semestre}</td>
               <td>{est.correo}</td>
+              <td>
+                <button onClick={() => eliminarEstudiante(est.numero_control)}>Eliminar</button>
+              </td>
             </tr>
           ))}
         </tbody>
