@@ -4,6 +4,7 @@ import axios from "axios";
 
 const ListaEstudiantes = () => {
   const [estudiantes, setEstudiantes] = useState([]);
+  const [busqueda, setBusqueda] = useState("");
 
   const obtenerEstudiantes = () => {
     axios.get("http://localhost:5000/api/estudiantes")
@@ -29,10 +30,32 @@ const ListaEstudiantes = () => {
     }
   };
 
+  const estudiantesFiltrados = estudiantes.filter((est) => {
+    const termino = busqueda.toLowerCase();
+    return (
+      est.numero_control.toLowerCase().includes(termino) ||
+      est.nombre_completo.toLowerCase().includes(termino)
+    );
+  });
+
   return (
     <div>
       <h2>Lista de Estudiantes</h2>
-      <table border="1" cellPadding="8">
+
+      <input
+        type="text"
+        placeholder="Buscar por número de control o nombre"
+        value={busqueda}
+        onChange={(e) => setBusqueda(e.target.value)}
+        style={{
+          marginBottom: "1rem",
+          padding: "8px",
+          width: "100%",
+          fontSize: "16px"
+        }}
+      />
+
+      <table border="1" cellPadding="8" style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
             <th>ID</th>
@@ -45,7 +68,7 @@ const ListaEstudiantes = () => {
           </tr>
         </thead>
         <tbody>
-          {estudiantes.map((est) => (
+          {estudiantesFiltrados.map((est) => (
             <tr key={est.id}>
               <td>{est.id}</td>
               <td>{est.numero_control}</td>
