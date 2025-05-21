@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from "react"
 import axios from "axios"
+import usuarios from "./data/usuarios"
 import FormularioEstudiante from "./components/FormularioEstudiante"
 import TablaEstudiantes from "./components/TablaEstudiantes"
-import usuarios from "./data/usuarios"
+import VistaEnfermeria from "./components/VistaEnfermeria"
+import VistaCoordinacion from "./components/VistaCoordinacion" // si lo usas luego
 
 const App = () => {
   const [estudiantes, setEstudiantes] = useState([])
@@ -13,7 +15,6 @@ const App = () => {
   const [password, setPassword] = useState("")
   const [rol, setRol] = useState(null)
   const [errorLogin, setErrorLogin] = useState("")
-  
 
   const obtenerEstudiantes = async () => {
     try {
@@ -25,7 +26,7 @@ const App = () => {
   }
 
   useEffect(() => {
-    if (rol) {
+    if (rol === "coordinacion") {
       obtenerEstudiantes()
     }
   }, [rol])
@@ -51,7 +52,7 @@ const App = () => {
     setEstudianteEditar(null)
   }
 
-  // Si aún no hay rol, mostramos login
+  // LOGIN
   if (!rol) {
     return (
       <div style={{ padding: "2rem" }}>
@@ -78,27 +79,46 @@ const App = () => {
     )
   }
 
-  // Si ya hay rol, mostramos la app según el rol
-  return (
-    <div style={{ padding: "2rem" }}>
-      <h1>Gestor de Estudiantes</h1>
-      <p>Rol actual: <strong>{rol}</strong></p>
-      <button onClick={handleLogout} style={{ marginBottom: "1rem" }}>Cerrar sesión</button>
+  // ENFERMERÍA
+  if (rol === "enfermeria") {
+    return (
+      <div style={{ padding: "2rem" }}>
+        <h1>Panel de Enfermería</h1>
+        <p>Rol actual: <strong>{rol}</strong></p>
+        <button onClick={handleLogout} style={{ marginBottom: "1rem" }}>Cerrar sesión</button>
+        <VistaEnfermeria />
+      </div>
+    )
+  }
 
-      {/* Solo se muestra el formulario a ciertos roles si quieres */}
-      {rol === "coordinacion" && (
+  // COORDINACIÓN
+  if (rol === "coordinacion") {
+    return (
+      <div style={{ padding: "2rem" }}>
+        <h1>Gestor de Estudiantes</h1>
+        <p>Rol actual: <strong>{rol}</strong></p>
+        <button onClick={handleLogout} style={{ marginBottom: "1rem" }}>Cerrar sesión</button>
+
         <FormularioEstudiante
           obtenerEstudiantes={obtenerEstudiantes}
           estudianteEditar={estudianteEditar}
         />
-      )}
 
-      <TablaEstudiantes
-        estudiantes={estudiantes}
-        onEditar={rol === "coordinacion" ? setEstudianteEditar : () => {}}
-        obtenerEstudiantes={obtenerEstudiantes}
-        rol={rol}
-      />
+        <TablaEstudiantes
+          estudiantes={estudiantes}
+          onEditar={setEstudianteEditar}
+          obtenerEstudiantes={obtenerEstudiantes}
+          rol={rol}
+        />
+      </div>
+    )
+  }
+
+  // ROL NO RECONOCIDO
+  return (
+    <div style={{ padding: "2rem" }}>
+      <h1>Rol no reconocido</h1>
+      <button onClick={handleLogout}>Cerrar sesión</button>
     </div>
   )
 }
