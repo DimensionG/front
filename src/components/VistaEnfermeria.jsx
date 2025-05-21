@@ -1,11 +1,30 @@
 import TablaEstudiantes from "./TablaEstudiantes"
 import FormularioEstudiante from "./FormularioEstudiante"
+import TablaJustificantes from "./TablaJustificantes"
 import { useEffect, useState } from "react"
 import axios from "axios"
 
 const VistaEnfermeria = () => {
   const [estudiantes, setEstudiantes] = useState([])
   const [estudianteEditar, setEstudianteEditar] = useState(null)
+  // 🟩 Aquí adentro está bien definido
+  const [justificantes, setJustificantes] = useState([
+    {
+      id: 1,
+      numero_control: "21211212121",
+      motivo: "Consulta médica",
+      fecha: "2025-05-21",
+      estado: "pendiente_enfermeria"
+    },
+    {
+      id: 2,
+      numero_control: "20214521",
+      motivo: "Cirugía",
+      fecha: "2025-05-20",
+      estado: "pendiente_enfermeria"
+    }
+  ])
+
 
   const obtenerEstudiantes = async () => {
     try {
@@ -25,6 +44,8 @@ const VistaEnfermeria = () => {
     <h2>Panel de Enfermería</h2>
     <FormularioEstudiante obtenerEstudiantes={obtenerEstudiantes} estudianteEditar={estudianteEditar} />
     <TablaEstudiantes estudiantes={estudiantes} onEditar={setEstudianteEditar} obtenerEstudiantes={obtenerEstudiantes} />
+    <TablaJustificantes justificantes={justificantes} setJustificantes={setJustificantes} />
+
 
     {/* Tabla de justificantes - estática por ahora */}
     <div style={{ marginTop: "2rem" }}>
