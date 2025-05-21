@@ -2,7 +2,7 @@
 import { useState } from "react"
 import axios from "axios"
 
-const TablaEstudiantes = ({ estudiantes, onEditar, obtenerEstudiantes }) => {
+const TablaEstudiantes = ({ estudiantes, onEditar, obtenerEstudiantes, rol}) => {
   const [paginaActual, setPaginaActual] = useState(1)
   const estudiantesPorPagina = 5
 
