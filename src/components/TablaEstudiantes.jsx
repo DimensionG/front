@@ -1,9 +1,10 @@
 "use client"
-import axios from "axios"
 import { useState } from "react"
+import axios from "axios"
 
 const TablaEstudiantes = ({ estudiantes, onEditar, obtenerEstudiantes }) => {
-  const [busqueda, setBusqueda] = useState("")
+  const [paginaActual, setPaginaActual] = useState(1)
+  const estudiantesPorPagina = 5
 
   const eliminarEstudiante = async (numero_control) => {
     if (window.confirm("¿Estás seguro de eliminar este estudiante?")) {
@@ -18,29 +19,19 @@ const TablaEstudiantes = ({ estudiantes, onEditar, obtenerEstudiantes }) => {
     }
   }
 
-  const estudiantesFiltrados = estudiantes.filter((est) => {
-    const termino = busqueda.toLowerCase()
-    return (
-      est.numero_control.toLowerCase().includes(termino) ||
-      est.nombre_completo.toLowerCase().includes(termino)
-    )
-  })
+  // Paginación
+  const totalPaginas = Math.ceil(estudiantes.length / estudiantesPorPagina)
+  const indiceInicio = (paginaActual - 1) * estudiantesPorPagina
+  const estudiantesPaginados = estudiantes.slice(indiceInicio, indiceInicio + estudiantesPorPagina)
+
+  const cambiarPagina = (nuevaPagina) => {
+    if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
+      setPaginaActual(nuevaPagina)
+    }
+  }
 
   return (
     <div>
-      <input
-        type="text"
-        placeholder="Buscar por número de control o nombre"
-        value={busqueda}
-        onChange={(e) => setBusqueda(e.target.value)}
-        style={{
-          marginBottom: "1rem",
-          padding: "8px",
-          width: "100%",
-          fontSize: "16px",
-        }}
-      />
-
       <table border={1} cellPadding={8} style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
@@ -53,7 +44,7 @@ const TablaEstudiantes = ({ estudiantes, onEditar, obtenerEstudiantes }) => {
           </tr>
         </thead>
         <tbody>
-          {estudiantesFiltrados.map((estudiante) => (
+          {estudiantesPaginados.map((estudiante) => (
             <tr key={estudiante.id}>
               <td>{estudiante.numero_control}</td>
               <td>{estudiante.nombre_completo}</td>
@@ -68,6 +59,17 @@ const TablaEstudiantes = ({ estudiantes, onEditar, obtenerEstudiantes }) => {
           ))}
         </tbody>
       </table>
+
+      {/* Controles de paginación */}
+      <div style={{ marginTop: "1rem", display: "flex", justifyContent: "center", gap: "10px" }}>
+        <button onClick={() => cambiarPagina(paginaActual - 1)} disabled={paginaActual === 1}>
+          Anterior
+        </button>
+        <span>Página {paginaActual} de {totalPaginas}</span>
+        <button onClick={() => cambiarPagina(paginaActual + 1)} disabled={paginaActual === totalPaginas}>
+          Siguiente
+        </button>
+      </div>
     </div>
   )
 }
