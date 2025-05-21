@@ -21,12 +21,48 @@ const VistaEnfermeria = () => {
   }, [])
 
   return (
-    <div>
-      <h2>Panel de Enfermería</h2>
-      <FormularioEstudiante obtenerEstudiantes={obtenerEstudiantes} estudianteEditar={estudianteEditar} />
-      <TablaEstudiantes estudiantes={estudiantes} onEditar={setEstudianteEditar} obtenerEstudiantes={obtenerEstudiantes} />
+  <div>
+    <h2>Panel de Enfermería</h2>
+    <FormularioEstudiante obtenerEstudiantes={obtenerEstudiantes} estudianteEditar={estudianteEditar} />
+    <TablaEstudiantes estudiantes={estudiantes} onEditar={setEstudianteEditar} obtenerEstudiantes={obtenerEstudiantes} />
+
+    {/* Tabla de justificantes - estática por ahora */}
+    <div style={{ marginTop: "2rem" }}>
+      <h2>Lista de Justificantes</h2>
+      <table border={1} cellPadding={8} style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>No. Control</th>
+            <th>Motivo</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>21211212121</td>
+            <td>Consulta médica</td>
+            <td>2025-05-21</td>
+            <td>Pendiente</td>
+            <td><button>Validar</button></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>20214521</td>
+            <td>Cirugía</td>
+            <td>2025-05-20</td>
+            <td>Aprobado</td>
+            <td><button>Revisar</button></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-  )
+  </div>
+)
+
 }
 
 export default VistaEnfermeria
