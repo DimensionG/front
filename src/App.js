@@ -6,7 +6,7 @@ import usuarios from "./data/usuarios"
 import FormularioEstudiante from "./components/FormularioEstudiante"
 import TablaEstudiantes from "./components/TablaEstudiantes"
 import VistaEnfermeria from "./components/VistaEnfermeria"
-import VistaCoordinacion from "./components/VistaCoordinacion" // si lo usas luego
+import VistaCoordinador from "./components/VistaCoordinacion" // ✅ Agregado
 
 const App = () => {
   const [estudiantes, setEstudiantes] = useState([])
@@ -16,6 +16,9 @@ const App = () => {
   const [rol, setRol] = useState(null)
   const [errorLogin, setErrorLogin] = useState("")
 
+  const [justificantes, setJustificantes] = useState([]) // ✅ Nuevo estado para justificantes
+
+  // 🔄 Obtener estudiantes
   const obtenerEstudiantes = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/estudiantes")
@@ -25,9 +28,20 @@ const App = () => {
     }
   }
 
+  // 🔄 Obtener justificantes
+  const obtenerJustificantes = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/justificantes")
+      setJustificantes(response.data)
+    } catch (error) {
+      console.error("Error al obtener justificantes:", error)
+    }
+  }
+
   useEffect(() => {
     if (rol === "coordinacion") {
       obtenerEstudiantes()
+      obtenerJustificantes()
     }
   }, [rol])
 
@@ -50,6 +64,7 @@ const App = () => {
     setPassword("")
     setEstudiantes([])
     setEstudianteEditar(null)
+    setJustificantes([]) // ✅ Limpiar justificantes también
   }
 
   // LOGIN
@@ -95,7 +110,7 @@ const App = () => {
   if (rol === "coordinacion") {
     return (
       <div style={{ padding: "2rem" }}>
-        <h1>Gestor de Estudiantes</h1>
+        <h1>Gestor de Estudiantes y Justificantes</h1>
         <p>Rol actual: <strong>{rol}</strong></p>
         <button onClick={handleLogout} style={{ marginBottom: "1rem" }}>Cerrar sesión</button>
 
@@ -109,6 +124,13 @@ const App = () => {
           onEditar={setEstudianteEditar}
           obtenerEstudiantes={obtenerEstudiantes}
           rol={rol}
+        />
+
+        <hr />
+
+        <VistaCoordinador
+          justificantes={justificantes}
+          setJustificantes={setJustificantes}
         />
       </div>
     )
