@@ -6,7 +6,8 @@ import usuarios from "./data/usuarios"
 import FormularioEstudiante from "./components/FormularioEstudiante"
 import TablaEstudiantes from "./components/TablaEstudiantes"
 import VistaEnfermeria from "./components/VistaEnfermeria"
-import VistaCoordinador from "./components/VistaCoordinacion" // ✅ Agregado
+import VistaCoordinador from "./components/VistaCoordinacion"
+import "./login-styles.css" // Importamos los estilos del login
 
 const App = () => {
   const [estudiantes, setEstudiantes] = useState([])
@@ -16,9 +17,9 @@ const App = () => {
   const [rol, setRol] = useState(null)
   const [errorLogin, setErrorLogin] = useState("")
 
-  const [justificantes, setJustificantes] = useState([]) // ✅ Nuevo estado para justificantes
+  const [justificantes, setJustificantes] = useState([])
 
-  // 🔄 Obtener estudiantes
+  // Obtener estudiantes
   const obtenerEstudiantes = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/estudiantes")
@@ -28,7 +29,7 @@ const App = () => {
     }
   }
 
-  // 🔄 Obtener justificantes
+  // Obtener justificantes
   const obtenerJustificantes = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/justificantes")
@@ -47,9 +48,7 @@ const App = () => {
 
   const handleLogin = (e) => {
     e.preventDefault()
-    const usuarioEncontrado = usuarios.find(
-      (u) => u.usuario === usuario && u.password === password
-    )
+    const usuarioEncontrado = usuarios.find((u) => u.usuario === usuario && u.password === password)
     if (usuarioEncontrado) {
       setRol(usuarioEncontrado.rol)
       setErrorLogin("")
@@ -64,32 +63,48 @@ const App = () => {
     setPassword("")
     setEstudiantes([])
     setEstudianteEditar(null)
-    setJustificantes([]) // ✅ Limpiar justificantes también
+    setJustificantes([])
   }
 
   // LOGIN
   if (!rol) {
     return (
-      <div style={{ padding: "2rem" }}>
-        <h2>Iniciar sesión</h2>
-        <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", width: "300px" }}>
-          <input
-            type="text"
-            placeholder="Usuario"
-            value={usuario}
-            onChange={(e) => setUsuario(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <button type="submit">Entrar</button>
-        </form>
-        {errorLogin && <p style={{ color: "red" }}>{errorLogin}</p>}
+      <div className="login-container">
+        <div className="login-card">
+          <div className="login-header">
+            <h2 className="login-title">Sistema de Justificantes</h2>
+            <p className="login-subtitle">Inicia sesión para continuar</p>
+          </div>
+
+          <form onSubmit={handleLogin} className="login-form">
+            <input
+              type="text"
+              placeholder="Usuario"
+              value={usuario}
+              onChange={(e) => setUsuario(e.target.value)}
+              required
+              className="login-input"
+            />
+            <input
+              type="password"
+              placeholder="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="login-input"
+            />
+            <button type="submit" className="login-button">
+              Iniciar Sesión
+            </button>
+          </form>
+
+          {errorLogin && <div className="login-error">{errorLogin}</div>}
+
+          <div className="login-footer">
+            <p>Credenciales de prueba:</p>
+            <p>Usuario: admin | Contraseña: admin</p>
+          </div>
+        </div>
       </div>
     )
   }
@@ -99,8 +114,12 @@ const App = () => {
     return (
       <div style={{ padding: "2rem" }}>
         <h1>Panel de Enfermería</h1>
-        <p>Rol actual: <strong>{rol}</strong></p>
-        <button onClick={handleLogout} style={{ marginBottom: "1rem" }}>Cerrar sesión</button>
+        <p>
+          Rol actual: <strong>{rol}</strong>
+        </p>
+        <button onClick={handleLogout} style={{ marginBottom: "1rem" }}>
+          Cerrar sesión
+        </button>
         <VistaEnfermeria />
       </div>
     )
@@ -111,13 +130,14 @@ const App = () => {
     return (
       <div style={{ padding: "2rem" }}>
         <h1>Gestor de Estudiantes y Justificantes</h1>
-        <p>Rol actual: <strong>{rol}</strong></p>
-        <button onClick={handleLogout} style={{ marginBottom: "1rem" }}>Cerrar sesión</button>
+        <p>
+          Rol actual: <strong>{rol}</strong>
+        </p>
+        <button onClick={handleLogout} style={{ marginBottom: "1rem" }}>
+          Cerrar sesión
+        </button>
 
-        <FormularioEstudiante
-          obtenerEstudiantes={obtenerEstudiantes}
-          estudianteEditar={estudianteEditar}
-        />
+        <FormularioEstudiante obtenerEstudiantes={obtenerEstudiantes} estudianteEditar={estudianteEditar} />
 
         <TablaEstudiantes
           estudiantes={estudiantes}
@@ -128,10 +148,7 @@ const App = () => {
 
         <hr />
 
-        <VistaCoordinador
-          justificantes={justificantes}
-          setJustificantes={setJustificantes}
-        />
+        <VistaCoordinador justificantes={justificantes} setJustificantes={setJustificantes} />
       </div>
     )
   }
