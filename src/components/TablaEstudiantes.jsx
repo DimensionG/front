@@ -3,7 +3,15 @@
 import { useState } from "react"
 import axios from "axios"
 
-const TablaEstudiantes = ({ estudiantes, onEditar, obtenerEstudiantes, rol }) => {
+const TablaEstudiantes = ({
+  estudiantes,
+  onEditar,
+  obtenerEstudiantes,
+  rol,
+  justificantes = [],
+  setJustificantes = () => {},
+  setMensaje = () => {},
+}) => {
   const [paginaActual, setPaginaActual] = useState(1)
   const [busqueda, setBusqueda] = useState("")
   const estudiantesPorPagina = 5
@@ -18,6 +26,46 @@ const TablaEstudiantes = ({ estudiantes, onEditar, obtenerEstudiantes, rol }) =>
         alert("Error al eliminar el estudiante")
         console.error(error)
       }
+    }
+  }
+
+  // Función para enviar justificante a coordinación
+  const enviarACoordinacion = (estudiante) => {
+    // Primero preguntamos por el motivo
+    const motivo = prompt("Ingrese el motivo del justificante:")
+
+    if (!motivo || !motivo.trim()) return
+
+    // Creamos un nuevo justificante
+    const nuevoJustificante = {
+      id: Date.now(), // ID temporal basado en timestamp
+      numero_control: estudiante.numero_control,
+      motivo: motivo.trim(),
+      fecha: new Date().toISOString().split("T")[0], // Fecha actual en formato YYYY-MM-DD
+      estado: "pendiente_coordinacion", // Lo enviamos directamente a coordinación
+      estudiante_nombre: estudiante.nombre_completo,
+    }
+
+    console.log("Creando nuevo justificante:", nuevoJustificante)
+
+    // Agregamos el nuevo justificante al estado
+    const nuevosJustificantes = [...justificantes, nuevoJustificante]
+    setJustificantes(nuevosJustificantes)
+
+    // Mostramos mensaje de éxito si estamos en enfermería
+    if (setMensaje) {
+      setMensaje({
+        tipo: "success",
+        texto: `✅ Justificante enviado a coordinación para ${estudiante.nombre_completo}`,
+      })
+
+      // Ocultar mensaje después de 3 segundos
+      setTimeout(() => {
+        setMensaje(null)
+      }, 3000)
+    } else {
+      // Si no tenemos setMensaje, usamos alert
+      alert(`Justificante enviado a coordinación para ${estudiante.nombre_completo}`)
     }
   }
 
@@ -82,6 +130,16 @@ const TablaEstudiantes = ({ estudiantes, onEditar, obtenerEstudiantes, rol }) =>
                     <div className="flex gap-sm">
                       <button onClick={() => onEditar(estudiante)} className="btn btn-sm btn-secondary">
                         Editar
+                      </button>
+                      <button
+                        onClick={() => enviarACoordinacion(estudiante)}
+                        className="btn btn-sm"
+                        style={{
+                          backgroundColor: "#0369a1",
+                          color: "white",
+                        }}
+                      >
+                        Enviar a Coordinación
                       </button>
                       <button
                         onClick={() => eliminarEstudiante(estudiante.numero_control)}

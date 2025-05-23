@@ -7,7 +7,7 @@ import FormularioEstudiante from "./components/FormularioEstudiante"
 import TablaEstudiantes from "./components/TablaEstudiantes"
 import VistaEnfermeria from "./components/VistaEnfermeria"
 import VistaCoordinador from "./components/VistaCoordinacion"
-import "./login-styles.css" // Importamos los estilos del login
+import "./login-styles.css"
 
 const App = () => {
   const [estudiantes, setEstudiantes] = useState([])
@@ -17,7 +17,26 @@ const App = () => {
   const [rol, setRol] = useState(null)
   const [errorLogin, setErrorLogin] = useState("")
 
-  const [justificantes, setJustificantes] = useState([])
+  // Estado compartido para justificantes - se carga desde localStorage
+  const [justificantes, setJustificantes] = useState(() => {
+    try {
+      const savedJustificantes = localStorage.getItem("justificantes")
+      return savedJustificantes ? JSON.parse(savedJustificantes) : []
+    } catch (error) {
+      console.error("Error al cargar justificantes desde localStorage:", error)
+      return []
+    }
+  })
+
+  // Guardar justificantes en localStorage cada vez que cambien
+  useEffect(() => {
+    try {
+      localStorage.setItem("justificantes", JSON.stringify(justificantes))
+      console.log("Justificantes guardados en localStorage:", justificantes)
+    } catch (error) {
+      console.error("Error al guardar justificantes en localStorage:", error)
+    }
+  }, [justificantes])
 
   // Obtener estudiantes
   const obtenerEstudiantes = async () => {
@@ -36,13 +55,15 @@ const App = () => {
       setJustificantes(response.data)
     } catch (error) {
       console.error("Error al obtener justificantes:", error)
+      // Si falla la API, mantenemos los datos del localStorage
     }
   }
 
   useEffect(() => {
-    if (rol === "coordinacion") {
+    if (rol) {
       obtenerEstudiantes()
-      obtenerJustificantes()
+      // Solo intentamos obtener justificantes si tenemos una API
+      // obtenerJustificantes()
     }
   }, [rol])
 
@@ -63,7 +84,13 @@ const App = () => {
     setPassword("")
     setEstudiantes([])
     setEstudianteEditar(null)
-    setJustificantes([])
+    // NO borramos los justificantes al cerrar sesión para mantener la persistencia
+  }
+
+  // Función para actualizar justificantes (compartida entre componentes)
+  const actualizarJustificantes = (nuevosJustificantes) => {
+    console.log("Actualizando justificantes:", nuevosJustificantes)
+    setJustificantes(nuevosJustificantes)
   }
 
   // LOGIN
@@ -120,7 +147,12 @@ const App = () => {
         <button onClick={handleLogout} style={{ marginBottom: "1rem" }}>
           Cerrar sesión
         </button>
-        <VistaEnfermeria />
+        <VistaEnfermeria
+          justificantes={justificantes}
+          setJustificantes={actualizarJustificantes}
+          estudiantes={estudiantes}
+          obtenerEstudiantes={obtenerEstudiantes}
+        />
       </div>
     )
   }
@@ -144,11 +176,13 @@ const App = () => {
           onEditar={setEstudianteEditar}
           obtenerEstudiantes={obtenerEstudiantes}
           rol={rol}
+          justificantes={justificantes}
+          setJustificantes={actualizarJustificantes}
         />
 
         <hr />
 
-        <VistaCoordinador justificantes={justificantes} setJustificantes={setJustificantes} />
+        <VistaCoordinador justificantes={justificantes} setJustificantes={actualizarJustificantes} />
       </div>
     )
   }
